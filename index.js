@@ -22,7 +22,7 @@ app.post('/api/chat', (req, res) => {
     type: 'text',
     title: req.body.title,
     author: 'user',
-    date: moment().format(),
+    date: moment().format('l'),
   }
 
   if(!newMessage.title) {
@@ -30,13 +30,17 @@ app.post('/api/chat', (req, res) => {
   }
 
   chat.push(newMessage);
-  res.json({
+
+  const response = {
     id: uuid.v4(),
     type: 'text',
     title: 'We hear you',
     author: 'bot',
-    date: moment().format(),
-  });
+    date: moment().format('l'),
+  }
+
+  res.json(response);
+  chat.push(response);
 });
 
 const PORT = process.env.PORT || 5000;
