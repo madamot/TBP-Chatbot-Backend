@@ -10,15 +10,34 @@ const REDIS_PORT = process.env.PORT || 6379;
 
 const client = redis.createClient(REDIS_PORT);
 
+client.on('connect', () => {
+  console.log('Connected to Redis...');
+});
+
+var multi = client.multi()
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Get Entire chat
+const conversation = [];
+
+// Get Previous chat
 app.get('/api/chat', (req, res) => {
-  res.json(chat);
+  const id = 'user001';
+
+  client.get(id, (err, obj) => {
+    if(!obj) {
+      console.log('no previous chat history');
+    } else {
+      const jsonify = JSON.parse(obj);
+      res.json([jsonify]);
+    }
+  });
+
+  // res.json(conversation);
 });
 
 // Create Message
@@ -35,7 +54,7 @@ app.post('/api/chat', (req, res) => {
     return res.status(400).json({ msg: 'No text in the message sent' })
   }
 
-  chat.push(newMessage);
+  conversation.push(newMessage);
 
   const response = {
     id: uuid.v4(),
@@ -46,7 +65,8 @@ app.post('/api/chat', (req, res) => {
   }
 
   res.json(response);
-  chat.push(response);
+  conversation.push(response);
+
 });
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
