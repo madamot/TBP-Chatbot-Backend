@@ -22,18 +22,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+let id = 'user001';
+
 const conversation = [];
 
 // Get Previous chat
 app.get('/api/chat', (req, res) => {
-  const id = 'user001';
 
-  client.get(id, (err, obj) => {
+  const convo = client.get(id, (err, obj) => {
     if(!obj) {
       console.log('no previous chat history');
     } else {
-      const jsonify = JSON.parse(obj);
-      res.json([jsonify]);
+      if (conversation.length == 0) {
+        const jsonify = JSON.parse(obj);
+        conversation.push(jsonify);
+      } else {
+        console.log('convo already loaded');
+      }
+
+      res.json(conversation);
     }
   });
 
@@ -43,29 +50,39 @@ app.get('/api/chat', (req, res) => {
 // Create Message
 app.post('/api/chat', (req, res) => {
   const newMessage = {
-    id: uuid.v4(),
-    type: 'text',
-    title: req.body.title,
-    author: 'user',
-    date: moment().format('l'),
+    "id": uuid.v4(),
+    "type": "text",
+    "title": req.body.title,
+    "author": "user",
+    "date": moment().format('l'),
   }
 
   if(!newMessage.title) {
     return res.status(400).json({ msg: 'No text in the message sent' })
   }
 
-  conversation.push(newMessage);
+  const jsonNewMessage = newMessage;
+
+  conversation.push(jsonNewMessage);
+
+  let stringified = JSON.stringify(conversation);
+  // var parsedObj = JSON.parse(jsonNewMessage);
+
+
+  client.set(id, stringified);
+
+
 
   const response = {
-    id: uuid.v4(),
-    type: 'text',
-    title: 'We hear you',
-    author: 'bot',
-    date: moment().format('l'),
+    "id": uuid.v4(),
+    "type": "text",
+    "title": "We hear you",
+    "author": "bot",
+    "date": moment().format('l'),
   }
 
   res.json(response);
-  conversation.push(response);
+  // conversation.push(response);
 
 });
 
