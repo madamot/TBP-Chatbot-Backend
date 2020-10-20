@@ -61,16 +61,15 @@ app.post('/api/chat', (req, res) => {
     return res.status(400).json({ msg: 'No text in the message sent' })
   }
 
-  const jsonNewMessage = newMessage;
+  // const jsonNewMessage = newMessage;
 
-  conversation.push(jsonNewMessage);
+  conversation.push(newMessage);
 
   let stringified = JSON.stringify(conversation);
   // var parsedObj = JSON.parse(jsonNewMessage);
 
 
   client.set(id, stringified);
-
 
 
   const response = {
@@ -82,7 +81,11 @@ app.post('/api/chat', (req, res) => {
   }
 
   res.json(response);
-  // conversation.push(response);
+  conversation.push(response);
+
+  let stringifiedAgain = JSON.stringify(conversation);
+
+  client.set(id, stringifiedAgain);
 
 });
 
