@@ -23,16 +23,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-
 // Get Previous chat
 app.get('/api/chat/:id', (req, res) => {
   // req.params = { id: id }
   var id = req.params.id;
 
   const convo = client.lrange(id, 0, -1, (err, obj) => {
-    if(!obj) {
-      console.log(`no previous chat history for ${id}`);
-      res.json({error: `no previous chat history for ${id}`})
+    if(!obj || obj.length == 0) {
+      res.status(404);
+      res.json({error: 'user does not exist'});
     } else {
       let convo = [];
 
@@ -40,7 +39,7 @@ app.get('/api/chat/:id', (req, res) => {
         const conversation = JSON.parse(obj[i]);
         convo.push(conversation);
       }
-
+      res.set('Content-Type', 'application/json');
       res.json(convo);
 
     }
@@ -93,4 +92,7 @@ var id = req.params.id;
 
 });
 
+
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+module.exports = app
