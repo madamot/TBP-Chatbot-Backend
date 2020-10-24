@@ -17,7 +17,6 @@ describe('GET /api/chat/:id', function () {
     });
 });
 
-
 /**
  * Testing get a user endpoint by giving a non-existing user
  */
@@ -29,6 +28,57 @@ describe('GET /api/chat/:id', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .expect({error: 'user does not exist'})
+            .end((err) => {
+                if (err) return done(err);
+                done();
+            });
+    });
+});
+
+/**
+ * Testing post user endpoint
+ */
+describe('POST /api/chat/:id', function () {
+    let data = {
+        "id": "user001",
+        "type": "text",
+        "title": "dummy test",
+        "author": "bot",
+        "date": "10/23/2020",
+    }
+    it('respond with 201 created', function (done) {
+        request(app)
+            .post('/api/chat/user001')
+            .send(data)
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(201)
+            .end((err) => {
+                if (err) return done(err);
+                done();
+            });
+    });
+});
+
+/**
+ * Testing post user endpoint
+ */
+describe('POST /api/chat/:id', function () {
+    let data = {
+        "id": "user001",
+        "type": "text",
+        "title": "",
+        "author": "bot",
+        "date": "10/23/2020",
+    }
+    it('When no text is posted respond with 400 not created', function (done) {
+        request(app)
+            .post('/api/chat/user001')
+            .send(data)
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .expect({ msg: 'No text in the message sent' })
             .end((err) => {
                 if (err) return done(err);
                 done();

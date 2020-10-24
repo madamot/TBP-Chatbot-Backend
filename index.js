@@ -30,8 +30,7 @@ app.get('/api/chat/:id', (req, res) => {
 
   const convo = client.lrange(id, 0, -1, (err, obj) => {
     if(!obj || obj.length == 0) {
-      res.status(404);
-      res.json({error: 'user does not exist'});
+      res.status(404).json({error: 'user does not exist'});
     } else {
       let convo = [];
 
@@ -84,14 +83,13 @@ var id = req.params.id;
     "date": moment().format('l'),
   }
 
-  res.json(response);
+  res.status(201).json(response);
 
   let stringifiedAgain = JSON.stringify(response);
 
   client.rpush(id, stringifiedAgain);
 
 });
-
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
