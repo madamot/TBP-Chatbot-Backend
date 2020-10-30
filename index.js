@@ -41,6 +41,7 @@ app.get('/api/chat/:id', (req, res) => {
       res.set('Content-Type', 'application/json');
       res.json(convo);
 
+      console.log(convo.length);
     }
   });
 
@@ -73,6 +74,7 @@ var id = req.params.id;
 
 
   client.rpush(id, stringified);
+  client.ltrim(id, -50, -1);
 
 
   const response = {
@@ -88,6 +90,7 @@ var id = req.params.id;
   let stringifiedAgain = JSON.stringify(response);
 
   client.rpush(id, stringifiedAgain);
+  client.ltrim(id, -50, -1);
 
 });
 
