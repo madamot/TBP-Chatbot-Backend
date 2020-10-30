@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index",
     "dev": "nodemon index",
-    "test": "mocha 'test/apiTest.js'"
+    "test": "mocha 'test/apiTest.js'",
+    "coverage": "nyc --reporter=html --reporter=text mocha"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +21,7 @@
   "devDependencies": {
     "mocha": "^8.2.0",
     "nodemon": "^2.0.4",
+    "nyc": "^15.1.0",
     "supertest": "^5.0.0"
   }
 }

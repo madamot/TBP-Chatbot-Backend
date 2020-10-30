@@ -3,7 +3,6 @@ const redis = require('redis');
 const uuid = require('uuid');
 const moment = require('moment');
 var cors = require('cors')
-const chat = require('./Chat')
 
 const PORT = process.env.PORT || 5000;
 const REDIS_PORT = process.env.PORT || 6379;
