@@ -22,25 +22,27 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-let id = 'user001';
 
-const conversation = [];
 
 // Get Previous chat
-app.get('/api/chat', (req, res) => {
+app.get('/api/chat/:id', (req, res) => {
+  // req.params = { id: id }
+  var id = req.params.id;
 
-  const convo = client.get(id, (err, obj) => {
+  const convo = client.lrange(id, 0, -1, (err, obj) => {
     if(!obj) {
-      console.log('no previous chat history');
+      console.log(`no previous chat history for ${id}`);
+      res.json({error: `no previous chat history for ${id}`})
     } else {
-      if (conversation.length == 0) {
-        const jsonify = JSON.parse(obj);
-        conversation.push(jsonify);
-      } else {
-        console.log('convo already loaded');
+      let convo = [];
+
+      for (var i = 0; i < obj.length; i++) {
+        const conversation = JSON.parse(obj[i]);
+        convo.push(conversation);
       }
 
-      res.json(conversation);
+      res.json(convo);
+
     }
   });
 
@@ -48,9 +50,12 @@ app.get('/api/chat', (req, res) => {
 });
 
 // Create Message
-app.post('/api/chat', (req, res) => {
+app.post('/api/chat/:id', (req, res) => {
+
+var id = req.params.id;
+
   const newMessage = {
-    "id": uuid.v4(),
+    "id": id,
     "type": "text",
     "title": req.body.title,
     "author": "user",
@@ -63,13 +68,13 @@ app.post('/api/chat', (req, res) => {
 
   // const jsonNewMessage = newMessage;
 
-  conversation.push(newMessage);
+  // conversation.push(newMessage);
 
-  let stringified = JSON.stringify(conversation);
+  let stringified = JSON.stringify(newMessage);
   // var parsedObj = JSON.parse(jsonNewMessage);
 
 
-  client.set(id, stringified);
+  client.rpush(id, stringified);
 
 
   const response = {
@@ -81,11 +86,10 @@ app.post('/api/chat', (req, res) => {
   }
 
   res.json(response);
-  conversation.push(response);
 
-  let stringifiedAgain = JSON.stringify(conversation);
+  let stringifiedAgain = JSON.stringify(response);
 
-  client.set(id, stringifiedAgain);
+  client.rpush(id, stringifiedAgain);
 
 });
 
