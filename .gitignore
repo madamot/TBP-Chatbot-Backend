@@ -18,6 +18,7 @@ Desktop.ini
 package-lock.json
 *.log
 *.gz
+.nyc_output/
 
 
 # Coveralls
