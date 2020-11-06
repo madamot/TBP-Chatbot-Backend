@@ -22,27 +22,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+let id = 'user001';
 
+const conversation = [];
 
 // Get Previous chat
-app.get('/api/chat/:id', (req, res) => {
-  // req.params = { id: id }
-  var id = req.params.id;
+app.get('/api/chat', (req, res) => {
 
-  const convo = client.lrange(id, 0, -1, (err, obj) => {
+  const convo = client.get(id, (err, obj) => {
     if(!obj) {
-      console.log(`no previous chat history for ${id}`);
-      res.json({error: `no previous chat history for ${id}`})
+      console.log('no previous chat history');
     } else {
-      let convo = [];
-
-      for (var i = 0; i < obj.length; i++) {
-        const conversation = JSON.parse(obj[i]);
-        convo.push(conversation);
+      if (conversation.length == 0) {
+        const jsonify = JSON.parse(obj);
+        conversation.push(jsonify);
+      } else {
+        console.log('convo already loaded');
       }
 
-      res.json(convo);
-
+      res.json(conversation);
     }
   });
 
@@ -50,12 +48,9 @@ app.get('/api/chat/:id', (req, res) => {
 });
 
 // Create Message
-app.post('/api/chat/:id', (req, res) => {
-
-var id = req.params.id;
-
+app.post('/api/chat', (req, res) => {
   const newMessage = {
-    "id": id,
+    "id": uuid.v4(),
     "type": "text",
     "title": req.body.title,
     "author": "user",
@@ -68,13 +63,13 @@ var id = req.params.id;
 
   // const jsonNewMessage = newMessage;
 
-  // conversation.push(newMessage);
+  conversation.push(newMessage);
 
-  let stringified = JSON.stringify(newMessage);
+  let stringified = JSON.stringify(conversation);
   // var parsedObj = JSON.parse(jsonNewMessage);
 
 
-  client.rpush(id, stringified);
+  client.set(id, stringified);
 
 
   const response = {
@@ -86,10 +81,11 @@ var id = req.params.id;
   }
 
   res.json(response);
+  conversation.push(response);
 
-  let stringifiedAgain = JSON.stringify(response);
+  let stringifiedAgain = JSON.stringify(conversation);
 
-  client.rpush(id, stringifiedAgain);
+  client.set(id, stringifiedAgain);
 
 });
 
