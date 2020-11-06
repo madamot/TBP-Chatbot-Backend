@@ -61,7 +61,7 @@ describe('POST /api/chat/:id', function () {
 });
 
 /**
- * Testing post user endpoint
+ * Testing post user endpoint with no text sent
  */
 describe('POST /api/chat/:id', function () {
     let data = {
